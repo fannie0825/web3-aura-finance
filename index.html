@@ -3,92 +3,455 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Token App</title>
+    <title>Aura Finance | Professional Web3 Banking</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="module" src="https://unpkg.com/thirdweb/dist/cdn/thirdweb.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 900: '#134e4a' },
+                        dark: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin-top: 50px; gap: 20px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc; }
-        #sendBtn { background-color: #007bff; color: white; border: none; }
-        #sendBtn:disabled { background-color: #cccccc; cursor: not-allowed; }
-        #status { color: #555; font-style: italic; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { background-color: #020617; color: #f8fafc; overflow-x: hidden; }
+        
+        .glass-panel { 
+            background: rgba(30, 41, 59, 0.4); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .nav-item.active { color: #2dd4bf; border-bottom: 2px solid #2dd4bf; }
+        .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .view-section.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+        
+        .toast { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-animate { animation: popIn 0.2s ease-out forwards; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col antialiased">
 
-    <h1>My Token Transfer</h1>
-    
-    <button id="connectBtn">Connect MetaMask</button>
-    <button id="sendBtn" disabled>Send 10 Tokens</button>
-    
-    <p id="status">Please connect your wallet first.</p>
+    <nav class="border-b border-white/10 bg-dark-950/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-blue-500 flex items-center justify-center shadow-lg shadow-brand-500/20" id="defaultLogo">
+                        <i class="fa-solid fa-bolt text-white text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Aura</span>
+                </div>
+                
+                <div class="hidden md:flex space-x-8 h-full items-center">
+                    <button class="nav-btn nav-item active h-full px-1 font-medium text-sm transition-colors hover:text-brand-400" data-target="dashboard">
+                        <i class="fa-solid fa-chart-pie mr-2"></i>Dashboard
+                    </button>
+                    <button class="nav-btn nav-item h-full px-1 font-medium text-sm text-slate-400 transition-colors hover:text-brand-400" data-target="transfer">
+                        <i class="fa-solid fa-paper-plane mr-2"></i>Transfer
+                    </button>
+                    <button class="nav-btn nav-item h-full px-1 font-medium text-sm text-slate-400 transition-colors hover:text-brand-400" data-target="earn">
+                        <i class="fa-solid fa-seedling mr-2"></i>Earn Yield
+                    </button>
+                    <button class="nav-btn nav-item h-full px-1 font-medium text-sm text-slate-400 transition-colors hover:text-brand-400" data-target="mechanism">
+                        <i class="fa-solid fa-book-open mr-2"></i>How it Works
+                    </button>
+                </div>
+                
+                <thirdweb-connect client-id="f89074cf1659a96271facb5788ed19b2" theme="dark"></thirdweb-connect>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+
+        <section id="dashboard" class="view-section active">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="glass-panel rounded-2xl p-6 lg:p-8">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <p class="text-slate-400 text-sm font-medium uppercase tracking-wider mb-1">Total Portfolio Value</p>
+                                <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight">$12,450.00</h1>
+                                <p class="text-brand-400 text-sm font-medium mt-2 flex items-center">
+                                    <i class="fa-solid fa-arrow-trend-up mr-1"></i> +$340.50 (2.8%) Today
+                                </p>
+                            </div>
+                        </div>
+                        <div class="h-64 w-full relative">
+                            <canvas id="portfolioChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="glass-panel rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-3">Your Assets</h3>
+                        <p class="text-xs text-slate-500 mb-2 italic">Click an asset for details</p>
+                        <div class="space-y-2">
+                            <div onclick="openAssetModal('Ethereum', 'ETH', '2.450', '$8,540.00', '#627eea')" class="flex justify-between items-center group cursor-pointer hover:bg-white/10 p-3 -mx-2 rounded-xl transition duration-200 border border-transparent hover:border-slate-700">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-[#627eea] flex items-center justify-center shadow-lg transform group-hover:scale-110 transition duration-200">
+                                        <i class="fa-brands fa-ethereum text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-sm text-white">Ethereum</p>
+                                        <p class="text-xs text-slate-400">ETH</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-mono text-sm text-white">2.450 ETH</p>
+                                    <p class="text-xs text-slate-400">$8,540.00</p>
+                                </div>
+                            </div>
+                            
+                            <div onclick="openAssetModal('Aura Token', 'AURO', '1,500', '$3,910.00', '#14b8a6')" class="flex justify-between items-center group cursor-pointer hover:bg-white/10 p-3 -mx-2 rounded-xl transition duration-200 border border-transparent hover:border-brand-500/30">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-blue-500 flex items-center justify-center shadow-lg shadow-brand-500/20 transform group-hover:scale-110 transition duration-200">
+                                        <i class="fa-solid fa-a text-white"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-sm text-white">Aura Token</p>
+                                        <p class="text-xs text-brand-400">AURO</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-mono text-sm text-white">1,500 AURO</p>
+                                    <p class="text-xs text-slate-400">$3,910.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="transfer" class="view-section">
+            <div class="max-w-xl mx-auto">
+                <div class="glass-panel rounded-3xl p-8 relative overflow-hidden">
+                    <div class="absolute -top-24 -right-24 w-48 h-48 bg-brand-500/20 rounded-full blur-3xl"></div>
+                    
+                    <h2 class="text-2xl font-bold text-white mb-2 relative z-10">P2P Transfer</h2>
+                    <p class="text-slate-400 text-sm mb-8 relative z-10">Send AURO tokens instantly.</p>
+                    
+                    <div class="space-y-6 relative z-10">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Recipient Address</label>
+                            <input type="text" id="recipientAddress" placeholder="0x..." class="w-full bg-dark-900/50 border border-slate-700 rounded-xl py-4 px-4 text-white text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Amount</label>
+                            <div class="relative">
+                                <input type="number" id="transferAmount" placeholder="0.00" class="w-full bg-dark-900/50 border border-slate-700 rounded-xl py-4 pl-4 pr-16 text-white text-lg font-mono focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                    <span class="text-brand-400 font-bold">AURO</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="reviewTransfer()" class="w-full bg-gradient-to-r from-brand-600 to-brand-400 hover:from-brand-500 hover:to-brand-300 text-white font-bold py-4 rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-lg shadow-brand-500/25 mt-4">
+                            Review Transfer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="earn" class="view-section">
+            <div class="max-w-xl mx-auto glass-panel rounded-3xl p-8">
+                <h3 class="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Staking Console</h3>
+                <div class="space-y-4">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wide">Amount to Stake</label>
+                    <input type="number" id="stakeAmount" placeholder="0.00" class="w-full bg-dark-900/50 border border-slate-700 rounded-xl py-3 px-4 text-white font-mono mb-4">
+                    
+                    <button onclick="reviewStake()" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 rounded-xl transition duration-300 shadow-lg shadow-brand-500/20">
+                        Stake AURO
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="mechanism" class="view-section">
+            <div class="max-w-5xl mx-auto space-y-8">
+                
+                <div class="glass-panel rounded-3xl p-10 text-center relative overflow-hidden border-t-4 border-t-brand-500">
+                    <div class="absolute -top-32 -left-32 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-32 -right-32 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
+                    
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4 relative z-10">The Aura Mechanism</h2>
+                    <p class="text-lg text-slate-400 max-w-2xl mx-auto relative z-10">Aura Finance is a decentralized Web3 banking protocol. Here is how our tokenomics and smart contracts power the ecosystem.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    
+                    <div class="glass-panel rounded-2xl p-8 hover:border-brand-500/50 transition duration-300">
+                        <div class="w-12 h-12 rounded-lg bg-dark-800 flex items-center justify-center mb-6 border border-slate-700">
+                            <i class="fa-solid fa-coins text-brand-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">1. Tokenomics (AURO)</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                            AURO is an ERC-20 standard utility token deployed on the Ethereum Sepolia Testnet. It acts as the backbone of the ecosystem.
+                        </p>
+                        <ul class="text-sm text-slate-300 space-y-2">
+                            <li><i class="fa-solid fa-check text-brand-500 mr-2"></i><strong>Max Supply:</strong> 1,000,000,000 AURO</li>
+                            <li><i class="fa-solid fa-check text-brand-500 mr-2"></i><strong>Distribution:</strong> 100% reserved for ecosystem liquidity and staking rewards.</li>
+                            <li><i class="fa-solid fa-check text-brand-500 mr-2"></i><strong>No Bonding Curve:</strong> Ensures stable issuance without immediate market volatility.</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-8 hover:border-brand-500/50 transition duration-300">
+                        <div class="w-12 h-12 rounded-lg bg-dark-800 flex items-center justify-center mb-6 border border-slate-700">
+                            <i class="fa-solid fa-people-arrows text-blue-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">2. Peer-to-Peer Finance</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                            Traditional banking relies on centralized ledgers. Aura utilizes Web3 to allow permissionless, global value transfer.
+                        </p>
+                        <ul class="text-sm text-slate-300 space-y-2">
+                            <li><i class="fa-solid fa-arrow-right text-blue-500 mr-2"></i><strong>Direct Routing:</strong> Funds move wallet-to-wallet via the smart contract.</li>
+                            <li><i class="fa-solid fa-arrow-right text-blue-500 mr-2"></i><strong>Immutability:</strong> Every AURO transfer is publicly verifiable on the blockchain.</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-8 hover:border-brand-500/50 transition duration-300">
+                        <div class="w-12 h-12 rounded-lg bg-dark-800 flex items-center justify-center mb-6 border border-slate-700">
+                            <i class="fa-solid fa-vault text-amber-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">3. Smart Staking Yields</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                            Users can lock their AURO tokens in the staking vault to secure the network and earn a targeted 12% APY.
+                        </p>
+                        <p class="text-sm text-slate-300">
+                            The yield is generated mathematically by the smart contract, distributing newly minted AURO block-by-block proportionate to a user's share of the total staking pool.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-8 hover:border-brand-500/50 transition duration-300">
+                        <div class="w-12 h-12 rounded-lg bg-dark-800 flex items-center justify-center mb-6 border border-slate-700">
+                            <i class="fa-solid fa-shield-halved text-emerald-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">4. Contract Infrastructure</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                            Aura Finance interfaces directly with audited contracts deployed via Thirdweb, ensuring enterprise-grade security.
+                        </p>
+                        <div class="bg-dark-900 rounded-lg p-3 border border-slate-700 mt-2 text-xs font-mono text-slate-400 overflow-hidden">
+                            // Network: Ethereum Sepolia (11155111)<br>
+                            // Interface: ERC-20, ERC-20Burnable
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modalOverlay" class="fixed inset-0 bg-dark-950/90 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300" onclick="closeAllModals(event)">
+        
+        <div id="txModal" class="bg-dark-900 border border-slate-700 rounded-2xl w-full max-w-md hidden modal-animate overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+            <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-dark-800/50">
+                <h3 class="text-lg font-bold text-white"><i class="fa-solid fa-shield-halved text-brand-400 mr-2"></i>Review Transaction</h3>
+                <button onclick="closeAllModals()" class="text-slate-500 hover:text-white transition"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="bg-dark-950 rounded-xl p-4 border border-slate-800 text-center">
+                    <p class="text-sm text-slate-400 mb-1">You are sending</p>
+                    <p class="text-3xl font-mono font-bold text-brand-400" id="modalAmount">0.00 AURO</p>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">To Address:</p>
+                    <p class="font-mono text-sm text-white break-all bg-dark-800 p-3 rounded-lg border border-slate-700" id="modalAddress">0x...</p>
+                </div>
+                <div class="flex justify-between items-center text-sm border-t border-slate-800 pt-4 mt-4">
+                    <span class="text-slate-400">Estimated Network Fee</span>
+                    <span class="text-white">~0.001 ETH</span>
+                </div>
+                <button id="executeTransferBtn" class="w-full bg-brand-500 hover:bg-brand-400 text-white font-bold py-4 rounded-xl transition mt-4 flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-fingerprint"></i> Sign & Send
+                </button>
+            </div>
+        </div>
+
+        <div id="assetModal" class="bg-dark-900 border border-slate-700 rounded-2xl w-full max-w-sm hidden modal-animate overflow-hidden shadow-2xl text-center" onclick="event.stopPropagation()">
+            <div class="p-6 relative">
+                <button onclick="closeAllModals()" class="absolute top-4 right-4 text-slate-500 hover:text-white transition"><i class="fa-solid fa-times text-xl"></i></button>
+                <div id="modalAssetIcon" class="w-20 h-20 rounded-full bg-brand-500 mx-auto flex items-center justify-center shadow-lg shadow-brand-500/20 mb-4 text-3xl text-white">
+                    <i class="fa-solid fa-coins"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-1" id="modalAssetName">Token Name</h3>
+                <p class="text-brand-400 font-mono text-lg mb-6" id="modalAssetBalance">0.00 SYMBOL</p>
+                <div class="bg-dark-950 rounded-xl p-4 border border-slate-800 text-left space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500 text-sm">USD Value</span>
+                        <span class="text-white text-sm font-medium" id="modalAssetFiat">$0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500 text-sm">Network</span>
+                        <span class="text-white text-sm font-medium">Sepolia</span>
+                    </div>
+                </div>
+                <button onclick="closeAllModals(); switchTab('transfer');" class="w-full border border-brand-500 text-brand-400 hover:bg-brand-500 hover:text-white font-bold py-3 rounded-xl transition mt-6">
+                    Send Token
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
+
+    <script>
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.view-section');
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                navBtns.forEach(b => {
+                    b.classList.remove('active', 'text-brand-400');
+                    b.classList.add('text-slate-400');
+                    b.style.borderBottom = "none";
+                });
+                btn.classList.add('active', 'text-brand-400');
+                btn.classList.remove('text-slate-400');
+                btn.style.borderBottom = "2px solid #2dd4bf";
+
+                sections.forEach(sec => sec.classList.remove('active'));
+                document.getElementById(btn.getAttribute('data-target')).classList.add('active');
+            });
+        });
+
+        window.switchTab = function(targetId) { document.querySelector(`.nav-btn[data-target="${targetId}"]`).click(); }
+
+        const overlay = document.getElementById('modalOverlay');
+        const txModal = document.getElementById('txModal');
+        const assetModal = document.getElementById('assetModal');
+
+        window.closeAllModals = function(event) {
+            if(event && event.target !== overlay) return; 
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                txModal.classList.add('hidden');
+                assetModal.classList.add('hidden');
+            }, 300);
+        }
+
+        function showOverlay() {
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.style.opacity = '1', 10);
+        }
+
+        window.reviewTransfer = function() {
+            const address = document.getElementById('recipientAddress').value;
+            const amount = document.getElementById('transferAmount').value;
+            if(!address || !amount) return showToast("Please enter an address and amount.", "error");
+            
+            document.getElementById('modalAmount').innerText = `${amount} AURO`;
+            document.getElementById('modalAddress').innerText = address;
+            showOverlay();
+            txModal.classList.remove('hidden');
+        }
+
+        window.reviewStake = function() {
+            const amount = document.getElementById('stakeAmount').value;
+            if(!amount) return showToast("Enter an amount to stake.", "error");
+            
+            document.getElementById('modalAmount').innerText = `${amount} AURO (Stake)`;
+            document.getElementById('modalAddress').innerText = "Aura Staking Pool Contract";
+            showOverlay();
+            txModal.classList.remove('hidden');
+        }
+
+        window.openAssetModal = function(name, symbol, balance, fiat, color) {
+            document.getElementById('modalAssetName').innerText = name;
+            document.getElementById('modalAssetBalance').innerText = `${balance} ${symbol}`;
+            document.getElementById('modalAssetFiat').innerText = fiat;
+            document.getElementById('modalAssetIcon').style.backgroundColor = color;
+            showOverlay();
+            assetModal.classList.remove('hidden');
+        }
+
+        window.showToast = function(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const icon = type === 'success' ? '<i class="fa-solid fa-check-circle text-brand-400"></i>' : '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i>';
+            toast.className = `toast flex items-center gap-3 bg-dark-800 border ${type==='success'?'border-brand-500/30':'border-amber-500/30'} rounded-xl p-4 shadow-2xl min-w-[300px] text-white`;
+            toast.innerHTML = `${icon} <div><h4 class="font-bold text-sm">${type === 'success' ? 'Success' : 'Notice'}</h4><p class="text-xs text-slate-300">${message}</p></div>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 4000);
+        }
+
+        const ctx = document.getElementById('portfolioChart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(45, 212, 191, 0.4)'); gradient.addColorStop(1, 'rgba(45, 212, 191, 0)');
+        new Chart(ctx, {
+            type: 'line',
+            data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ data: [11200, 11800, 11500, 12100, 11900, 12250, 12450], borderColor: '#2dd4bf', backgroundColor: gradient, borderWidth: 3, fill: true, tension: 0.4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+        });
+    </script>
 
     <script type="module">
         import { createThirdwebClient, getContract, sendTransaction } from "https://esm.sh/thirdweb";
         import { transfer } from "https://esm.sh/thirdweb/extensions/erc20";
+        // 1. Add the wallet import
         import { createWallet } from "https://esm.sh/thirdweb/wallets";
 
-        // 1. Initialize your client and contract
         const client = createThirdwebClient({ clientId: "f89074cf1659a96271facb5788ed19b2" });
         const tokenContract = getContract({
             client,
-            chain: 11155111, // Sepolia Testnet
-            address: "0xE14c55A25c889f8B7A1E3ebF61e8ceA2B7504D8C" 
+            chain: 11155111,
+            // CHECK THIS ADDRESS: Ensure this is your actual token contract
+            address: "0xB6c25bBF3a6acCfE5a8FB19A6A2598712E5511C9" 
         });
 
-        // 2. Grab the HTML elements
-        const connectBtn = document.getElementById('connectBtn');
-        const sendBtn = document.getElementById('sendBtn');
-        const statusText = document.getElementById('status');
+        document.getElementById('executeTransferBtn').addEventListener('click', async () => {
+            const toAddress = document.getElementById('recipientAddress').value;
+            const amount = document.getElementById('transferAmount').value;
 
-        let activeAccount = null;
+            closeAllModals(); 
+            window.showToast("Please sign the transaction in your wallet...", "success");
 
-        // 3. Logic to connect the wallet
-        connectBtn.addEventListener('click', async () => {
             try {
-                statusText.innerText = "Connecting to wallet...";
-                
-                // Initialize MetaMask
+                // 2. Grab the active account from MetaMask (this is instant since they already connected via the UI button)
                 const wallet = createWallet("io.metamask");
-                
-                // Prompt user to connect
-                activeAccount = await wallet.connect({ client });
-                
-                // Update UI upon success
-                statusText.innerText = `Connected as: ${activeAccount.address}`;
-                connectBtn.innerText = "Wallet Connected";
-                connectBtn.disabled = true;
-                sendBtn.disabled = false; // Enable the send button
-            } catch (error) {
-                console.error(error);
-                statusText.innerText = "Failed to connect wallet. Do you have MetaMask installed?";
-            }
-        });
+                const activeAccount = await wallet.connect({ client });
 
-        // 4. Logic to send the transaction
-        sendBtn.addEventListener('click', async () => {
-            if (!activeAccount) return;
-
-            try {
-                statusText.innerText = "Please confirm the transaction in your wallet...";
-                
-                // Prepare the token transfer
-                const transaction = transfer({
-                    contract: tokenContract,
-                    to: "0xD9041F398453DEaC49A1f69d87E64d18721F17e0", // ---> CHANGE THIS TO A REAL WALLET ADDRESS
-                    amount: "10", // Amount of tokens to send
+                // 3. Prepare the transaction
+                const transaction = transfer({ 
+                    contract: tokenContract, 
+                    to: toAddress, 
+                    amount: amount 
                 });
 
-                // Send the transaction to the blockchain
-                const { transactionHash } = await sendTransaction({
-                    transaction,
-                    account: activeAccount
+                // 4. Send the transaction (Uncommented!)
+                const { transactionHash } = await sendTransaction({ 
+                    transaction, 
+                    account: activeAccount 
                 });
-
-                statusText.innerText = `Success! Transaction Hash: ${transactionHash}`;
+                
+                window.showToast(`Transfer sent! Hash: ${transactionHash}`, 'success');
             } catch (error) {
                 console.error(error);
-                statusText.innerText = "Transaction failed or was rejected by user.";
+                window.showToast("Transaction failed or was rejected.", "error");
             }
         });
     </script>
-</body>
-</html>
