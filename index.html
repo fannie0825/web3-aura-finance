@@ -77,7 +77,7 @@
                     </button>
                 </div>
                 
-                <thirdweb-connect client-id="YOUR_CLIENT_ID" theme="dark"></thirdweb-connect>
+                <thirdweb-connect client-id="f89074cf1659a96271facb5788ed19b2" theme="dark"></thirdweb-connect>
             </div>
         </div>
     </nav>
@@ -413,11 +413,11 @@
         import { createThirdwebClient, getContract, sendTransaction } from "https://esm.sh/thirdweb";
         import { transfer } from "https://esm.sh/thirdweb/extensions/erc20";
 
-        const client = createThirdwebClient({ clientId: "YOUR_CLIENT_ID" });
+        const client = createThirdwebClient({ clientId: "f89074cf1659a96271facb5788ed19b2" });
         const tokenContract = getContract({
             client,
             chain: 11155111,
-            address: "YOUR_TOKEN_CONTRACT_ADDRESS" 
+            address: "0xB6c25bBF3a6acCfE5a8FB19A6A2598712E5511C9" 
         });
 
         document.getElementById('executeTransferBtn').addEventListener('click', async () => {
