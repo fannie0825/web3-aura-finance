@@ -17,7 +17,7 @@
                     colors: {
                         brand: { 400: '#2dd4bf', 500: '#14b8a6', 600: '#0d9488', 900: '#134e4a' },
                         dark: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
-                        base: { 500: '#0052FF', 600: '#0043D1' } /* Base Network Blue */
+                        base: { 500: '#0052FF', 600: '#0043D1' }
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
@@ -52,10 +52,6 @@
 
         .trust-badge { filter: grayscale(100%) opacity(0.5); transition: all 0.3s ease; }
         .trust-badge:hover { filter: grayscale(0%) opacity(1); }
-
-        /* Custom Toggle Switch */
-        .toggle-checkbox:checked { right: 0; border-color: #14b8a6; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #14b8a6; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
@@ -64,7 +60,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-blue-500 flex items-center justify-center shadow-lg shadow-brand-500/20" id="defaultLogo">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-blue-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
                         <i class="fa-solid fa-bolt text-white text-xl"></i>
                     </div>
                     <span class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Aura</span>
@@ -123,11 +119,11 @@
                                     <i class="fa-solid fa-arrow-trend-up mr-1"></i> +$340.50 (2.8%) Today
                                 </p>
                             </div>
-                            <div class="hidden sm:flex bg-dark-900 rounded-lg p-1 border border-slate-700">
-                                <button class="px-3 py-1 text-xs font-medium text-white bg-slate-800 rounded shadow">1W</button>
-                                <button class="px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition">1M</button>
-                                <button class="px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition">YTD</button>
-                                <button class="px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition">ALL</button>
+                            <div class="hidden sm:flex bg-dark-900 rounded-lg p-1 border border-slate-700" id="chartFilters">
+                                <button onclick="updateChartData(this, '1W')" class="chart-filter px-3 py-1 text-xs font-medium text-white bg-slate-800 rounded shadow transition">1W</button>
+                                <button onclick="updateChartData(this, '1M')" class="chart-filter px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition">1M</button>
+                                <button onclick="updateChartData(this, 'YTD')" class="chart-filter px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition">YTD</button>
+                                <button onclick="updateChartData(this, 'ALL')" class="chart-filter px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition">ALL</button>
                             </div>
                         </div>
                         <div class="h-64 w-full relative">
@@ -218,7 +214,6 @@
 
         <section id="transfer" class="view-section">
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 max-w-6xl mx-auto">
-                
                 <div class="lg:col-span-3 glass-panel rounded-3xl p-8 relative overflow-hidden">
                     <div class="absolute -top-24 -right-24 w-48 h-48 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
                     
@@ -248,7 +243,7 @@
                             </div>
                             <div class="relative">
                                 <input type="text" id="recipientAddress" placeholder="0x..." class="w-full bg-dark-900/80 border border-slate-700 rounded-xl py-4 px-4 text-white text-sm font-mono focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
-                                <button class="absolute right-3 top-1/2 -translate-y-1/2 text-brand-400 text-xs font-bold px-2 py-1 hover:bg-brand-500/10 rounded transition">PASTE</button>
+                                <button onclick="document.getElementById('recipientAddress').value='0x8b9F4e2A1C3b7D9A5f6E8C2B1D4F0a3E7C9b2A1F'" class="absolute right-3 top-1/2 -translate-y-1/2 text-brand-400 text-xs font-bold px-2 py-1 hover:bg-brand-500/10 rounded transition">PASTE</button>
                             </div>
                         </div>
                         
@@ -257,7 +252,7 @@
                             <div class="relative">
                                 <input type="number" id="transferAmount" placeholder="0.00" class="w-full bg-dark-900/80 border border-slate-700 rounded-xl py-4 pl-4 pr-24 text-white text-xl font-mono focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
                                 <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
-                                    <button class="bg-dark-800 border border-slate-600 text-xs text-white px-3 py-1 rounded hover:bg-slate-700 transition">MAX</button>
+                                    <button onclick="document.getElementById('transferAmount').value=1500" class="bg-dark-800 border border-slate-600 text-xs text-white px-3 py-1 rounded hover:bg-slate-700 transition">MAX</button>
                                 </div>
                             </div>
                             <p class="text-xs text-slate-500 mt-2 text-right">≈ $0.00 USD</p>
@@ -356,8 +351,8 @@
                             <div class="bg-dark-900/80 border border-brand-500/30 rounded-2xl p-6 relative overflow-hidden">
                                 <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fa-solid fa-gift text-6xl text-brand-500"></i></div>
                                 <p class="text-sm text-slate-400 mb-1">Unclaimed Rewards</p>
-                                <h3 class="text-3xl font-mono font-bold text-brand-400 mb-4">12.45 <span class="text-lg">AURO</span></h3>
-                                <button onclick="window.showToast('Claiming rewards...', 'success')" class="bg-dark-800 hover:bg-dark-700 border border-brand-500 text-brand-400 font-bold py-2 px-6 rounded-lg transition text-sm">
+                                <h3 class="text-3xl font-mono font-bold text-brand-400 mb-4" id="unclaimedReward">12.45 <span class="text-lg">AURO</span></h3>
+                                <button id="claimBtn" onclick="processClaim(this)" class="bg-dark-800 hover:bg-dark-700 border border-brand-500 text-brand-400 font-bold py-2 px-6 rounded-lg transition text-sm flex items-center justify-center min-w-[140px]">
                                     Claim Rewards
                                 </button>
                             </div>
@@ -381,7 +376,7 @@
                                 <div class="relative">
                                     <input type="number" id="stakeAmount" placeholder="0.00" class="w-full bg-dark-900/80 border border-slate-700 rounded-xl py-4 pl-4 pr-24 text-white text-xl font-mono focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
                                     <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
-                                        <button class="bg-dark-800 border border-slate-600 text-xs text-white px-3 py-1 rounded hover:bg-slate-700 transition">MAX</button>
+                                        <button onclick="document.getElementById('stakeAmount').value=1000" class="bg-dark-800 border border-slate-600 text-xs text-white px-3 py-1 rounded hover:bg-slate-700 transition">MAX</button>
                                     </div>
                                 </div>
                             </div>
@@ -620,7 +615,6 @@
             document.getElementById('modalAssetBalance').innerText = `${balance} ${symbol}`;
             document.getElementById('modalAssetFiat').innerText = fiat;
             document.getElementById('modalAssetIcon').style.backgroundColor = color;
-            // Hack for ETH icon
             if(symbol === 'ETH') {
                 document.getElementById('modalAssetIcon').innerHTML = '<i class="fa-brands fa-ethereum text-white"></i>';
             } else {
@@ -628,6 +622,22 @@
             }
             showOverlay();
             assetModal.classList.remove('hidden');
+        }
+
+        // INTERACTIVE: Process Claiming Rewards
+        window.processClaim = function(btn) {
+            window.showToast("Initiating claim transaction...", "success");
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+            btn.disabled = true;
+            btn.classList.replace('bg-dark-800', 'bg-dark-900');
+            
+            setTimeout(() => {
+                document.getElementById('unclaimedReward').innerHTML = '0.00 <span class="text-lg">AURO</span>';
+                btn.innerHTML = 'Claimed!';
+                btn.classList.add('opacity-50', 'cursor-not-allowed', 'border-slate-700');
+                btn.classList.remove('text-brand-400', 'hover:bg-dark-700', 'border-brand-500');
+                window.showToast("Successfully claimed 12.45 AURO to your wallet.", "success");
+            }, 2500);
         }
 
         // Toast Logic
@@ -638,18 +648,43 @@
             toast.className = `toast flex items-center gap-4 bg-dark-800 border ${type==='success'?'border-brand-500/30':'border-amber-500/30'} rounded-xl p-4 shadow-2xl min-w-[300px] text-white`;
             toast.innerHTML = `${icon} <div><h4 class="font-bold text-sm">${type === 'success' ? 'Transaction Confirmed' : 'Network Notice'}</h4><p class="text-xs text-slate-300 mt-1 font-mono">${message}</p></div>`;
             container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 5000);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 4000);
         }
 
-        // Chart Polish
+        // INTERACTIVE: Chart Range Selector
+        let currentChart;
         const ctx = document.getElementById('portfolioChart').getContext('2d');
         const gradient = ctx.createLinearGradient(0, 0, 0, 300);
         gradient.addColorStop(0, 'rgba(45, 212, 191, 0.4)'); gradient.addColorStop(1, 'rgba(45, 212, 191, 0)');
-        new Chart(ctx, {
-            type: 'line',
-            data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ label: 'Portfolio Value', data: [11200, 11800, 11500, 12100, 11900, 12250, 12450], borderColor: '#2dd4bf', backgroundColor: gradient, borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: '#0f172a', pointBorderColor: '#2dd4bf', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e293b', titleColor: '#94a3b8', bodyColor: '#fff', borderColor: '#334155', borderWidth: 1, padding: 12, displayColors: false, callbacks: { label: function(context) { return '$' + context.parsed.y.toLocaleString(); } } } }, scales: { y: { display: true, position: 'right', grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', callback: function(value) { return '$' + value/1000 + 'k'; } } }, x: { display: true, grid: { display: false }, ticks: { color: '#64748b' } } }, interaction: { intersect: false, mode: 'index' } }
-        });
+        
+        // Initial Chart Setup
+        function initChart(dataPoints) {
+            if(currentChart) currentChart.destroy();
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: ['Point 1','Point 2','Point 3','Point 4','Point 5','Point 6','Point 7'], datasets: [{ label: 'Portfolio Value', data: dataPoints, borderColor: '#2dd4bf', backgroundColor: gradient, borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: '#0f172a', pointBorderColor: '#2dd4bf', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e293b', titleColor: '#94a3b8', bodyColor: '#fff', borderColor: '#334155', borderWidth: 1, padding: 12, displayColors: false, callbacks: { label: function(context) { return '$' + context.parsed.y.toLocaleString(); } } } }, scales: { y: { display: true, position: 'right', grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', callback: function(value) { return '$' + value/1000 + 'k'; } } }, x: { display: true, grid: { display: false }, ticks: { display: false } } }, interaction: { intersect: false, mode: 'index' } }
+            });
+        }
+        
+        // Start with 1W data
+        initChart([11200, 11800, 11500, 12100, 11900, 12250, 12450]);
+
+        // Function to handle clicking time ranges
+        window.updateChartData = function(btnElement, range) {
+            // Update button styles
+            const buttons = document.querySelectorAll('#chartFilters button');
+            buttons.forEach(btn => {
+                btn.className = "chart-filter px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition";
+            });
+            btnElement.className = "chart-filter px-3 py-1 text-xs font-medium text-white bg-slate-800 rounded shadow transition";
+            
+            // Load dummy data based on range selected
+            if(range === '1W') initChart([11200, 11800, 11500, 12100, 11900, 12250, 12450]);
+            if(range === '1M') initChart([9500, 9800, 10200, 11500, 10800, 11900, 12450]);
+            if(range === 'YTD') initChart([6000, 7200, 8500, 9000, 10500, 11200, 12450]);
+            if(range === 'ALL') initChart([2000, 3500, 3200, 5000, 8000, 11000, 12450]);
+        }
     </script>
 
     <script type="module">
@@ -661,7 +696,6 @@
         
         const tokenContract = getContract({
             client,
-            // UPDATED TO BASE MAINNET (8453)
             chain: 8453, 
             address: "0xEa2B155A369bD44221dc2A9f28ABB2D6e13fB94F" 
         });
@@ -672,13 +706,11 @@
 
             closeAllModals(); 
             
-            // Simulating the wallet popup for UI demo purposes
             setTimeout(() => {
                 window.showToast("Awaiting signature from wallet...", "success");
             }, 500);
 
             try {
-                // If the user actually connects a wallet, this attempts a real TX
                 const wallet = createWallet("io.metamask");
                 const activeAccount = await wallet.connect({ client });
 
@@ -696,7 +728,6 @@
                 window.showToast(`Transfer successful on Base. Hash: ${transactionHash.substring(0,8)}...`, 'success');
             } catch (error) {
                 console.error(error);
-                // Fallback UI toast if they cancel or aren't on Base network
                 setTimeout(() => {
                     window.showToast("Transaction simulated/failed. Check console.", "error");
                 }, 2000);
