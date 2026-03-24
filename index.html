@@ -412,15 +412,14 @@
     <script type="module">
         import { createThirdwebClient, getContract, sendTransaction } from "https://esm.sh/thirdweb";
         import { transfer } from "https://esm.sh/thirdweb/extensions/erc20";
-        // 1. Add the wallet import
         import { createWallet } from "https://esm.sh/thirdweb/wallets";
 
         const client = createThirdwebClient({ clientId: "f89074cf1659a96271facb5788ed19b2" });
         const tokenContract = getContract({
             client,
             chain: 11155111,
-            // CHECK THIS ADDRESS: Ensure this is your actual token contract
-            address: "0xB6c25bBF3a6acCfE5a8FB19A6A2598712E5511C9" 
+            // UPDATED: This is now your official AURO token contract address
+            address: "0xEa2B155A369bD44221dc2A9f28ABB2D6e13fB94F" 
         });
 
         document.getElementById('executeTransferBtn').addEventListener('click', async () => {
@@ -431,18 +430,15 @@
             window.showToast("Please sign the transaction in your wallet...", "success");
 
             try {
-                // 2. Grab the active account from MetaMask (this is instant since they already connected via the UI button)
                 const wallet = createWallet("io.metamask");
                 const activeAccount = await wallet.connect({ client });
 
-                // 3. Prepare the transaction
                 const transaction = transfer({ 
                     contract: tokenContract, 
                     to: toAddress, 
                     amount: amount 
                 });
 
-                // 4. Send the transaction (Uncommented!)
                 const { transactionHash } = await sendTransaction({ 
                     transaction, 
                     account: activeAccount 
@@ -455,3 +451,5 @@
             }
         });
     </script>
+</body>
+</html>
