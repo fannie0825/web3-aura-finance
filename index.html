@@ -48,6 +48,9 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        .trust-badge { filter: grayscale(100%) opacity(0.5); transition: all 0.3s ease; }
+        .trust-badge:hover { filter: grayscale(0%) opacity(1); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
@@ -85,7 +88,22 @@
     <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 relative z-10">
 
         <section id="dashboard" class="view-section active">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-blue-500">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Total Value Locked (TVL)</p>
+                    <h3 class="text-2xl font-bold text-white">$14,285,900.00</h3>
+                </div>
+                <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-brand-500">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">24h Trading Volume</p>
+                    <h3 class="text-2xl font-bold text-white">$1,142,300.50</h3>
+                </div>
+                <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-amber-400">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Current Network APY</p>
+                    <h3 class="text-2xl font-bold text-amber-400">12.4%</h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                 <div class="lg:col-span-2 space-y-6">
                     <div class="glass-panel rounded-2xl p-6 lg:p-8">
                         <div class="flex justify-between items-start mb-6">
@@ -95,6 +113,12 @@
                                 <p class="text-brand-400 text-sm font-medium mt-2 flex items-center">
                                     <i class="fa-solid fa-arrow-trend-up mr-1"></i> +$340.50 (2.8%) Today
                                 </p>
+                            </div>
+                            <div class="hidden sm:flex bg-dark-900 rounded-lg p-1 border border-slate-700">
+                                <button class="px-3 py-1 text-xs font-medium text-white bg-slate-800 rounded shadow">1W</button>
+                                <button class="px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition">1M</button>
+                                <button class="px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition">YTD</button>
+                                <button class="px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition">ALL</button>
                             </div>
                         </div>
                         <div class="h-64 w-full relative">
@@ -106,7 +130,6 @@
                 <div class="space-y-6">
                     <div class="glass-panel rounded-2xl p-6">
                         <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-3">Your Assets</h3>
-                        <p class="text-xs text-slate-500 mb-2 italic">Click an asset for details</p>
                         <div class="space-y-2">
                             <div onclick="openAssetModal('Ethereum', 'ETH', '2.450', '$8,540.00', '#627eea')" class="flex justify-between items-center group cursor-pointer hover:bg-white/10 p-3 -mx-2 rounded-xl transition duration-200 border border-transparent hover:border-slate-700">
                                 <div class="flex items-center gap-3">
@@ -141,6 +164,55 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 overflow-hidden">
+                <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-3">Recent Activity</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-xs font-semibold text-slate-500 uppercase tracking-wide border-b border-slate-800">
+                                <th class="pb-3 pr-4">Transaction</th>
+                                <th class="pb-3 px-4">Amount</th>
+                                <th class="pb-3 px-4">Date</th>
+                                <th class="pb-3 px-4">Status</th>
+                                <th class="pb-3 pl-4 text-right">Hash</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-800/50">
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-4 pr-4 flex items-center gap-3 text-white">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i class="fa-solid fa-arrow-down"></i></div>
+                                    Receive
+                                </td>
+                                <td class="py-4 px-4 font-mono text-emerald-400">+500.00 AURO</td>
+                                <td class="py-4 px-4 text-slate-400">Today, 10:24 AM</td>
+                                <td class="py-4 px-4"><span class="bg-emerald-500/20 text-emerald-400 py-1 px-2 rounded text-xs font-bold">Completed</span></td>
+                                <td class="py-4 pl-4 text-right font-mono text-brand-400 hover:text-brand-300 cursor-pointer">0x7a...3f9</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-4 pr-4 flex items-center gap-3 text-white">
+                                    <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center"><i class="fa-solid fa-lock"></i></div>
+                                    Stake
+                                </td>
+                                <td class="py-4 px-4 font-mono text-white">250.00 AURO</td>
+                                <td class="py-4 px-4 text-slate-400">Yesterday, 2:15 PM</td>
+                                <td class="py-4 px-4"><span class="bg-emerald-500/20 text-emerald-400 py-1 px-2 rounded text-xs font-bold">Completed</span></td>
+                                <td class="py-4 pl-4 text-right font-mono text-brand-400 hover:text-brand-300 cursor-pointer">0x2b...8e1</td>
+                            </tr>
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="py-4 pr-4 flex items-center gap-3 text-white">
+                                    <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center"><i class="fa-solid fa-arrow-up"></i></div>
+                                    Send
+                                </td>
+                                <td class="py-4 px-4 font-mono text-white">-1.50 ETH</td>
+                                <td class="py-4 px-4 text-slate-400">Mar 22, 9:00 AM</td>
+                                <td class="py-4 px-4"><span class="bg-emerald-500/20 text-emerald-400 py-1 px-2 rounded text-xs font-bold">Completed</span></td>
+                                <td class="py-4 pl-4 text-right font-mono text-brand-400 hover:text-brand-300 cursor-pointer">0x9c...4a2</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -263,6 +335,24 @@
                 </div>
             </div>
         </section>
+        
+        <footer class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-6">
+                <div class="text-slate-500 text-sm flex items-center gap-2 trust-badge cursor-pointer">
+                    <i class="fa-solid fa-shield-check"></i> Audited by CertiK
+                </div>
+                <div class="text-slate-500 text-sm flex items-center gap-2 trust-badge cursor-pointer">
+                    <i class="fa-solid fa-lock"></i> Secured by OpenZeppelin
+                </div>
+            </div>
+            <div class="flex gap-6 text-sm text-slate-500">
+                <a href="#" class="hover:text-white transition">Terms</a>
+                <a href="#" class="hover:text-white transition">Privacy</a>
+                <a href="#" class="hover:text-white transition">Whitepaper</a>
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-github text-lg"></i></a>
+            </div>
+        </footer>
+
     </main>
 
     <div id="modalOverlay" class="fixed inset-0 bg-dark-950/90 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300" onclick="closeAllModals(event)">
@@ -399,13 +489,14 @@
             setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 4000);
         }
 
+        // Updated Chart Polish
         const ctx = document.getElementById('portfolioChart').getContext('2d');
         const gradient = ctx.createLinearGradient(0, 0, 0, 300);
         gradient.addColorStop(0, 'rgba(45, 212, 191, 0.4)'); gradient.addColorStop(1, 'rgba(45, 212, 191, 0)');
         new Chart(ctx, {
             type: 'line',
-            data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ data: [11200, 11800, 11500, 12100, 11900, 12250, 12450], borderColor: '#2dd4bf', backgroundColor: gradient, borderWidth: 3, fill: true, tension: 0.4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+            data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets: [{ label: 'Portfolio Value', data: [11200, 11800, 11500, 12100, 11900, 12250, 12450], borderColor: '#2dd4bf', backgroundColor: gradient, borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: '#0f172a', pointBorderColor: '#2dd4bf', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e293b', titleColor: '#94a3b8', bodyColor: '#fff', borderColor: '#334155', borderWidth: 1, padding: 12, displayColors: false, callbacks: { label: function(context) { return '$' + context.parsed.y.toLocaleString(); } } } }, scales: { y: { display: true, position: 'right', grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', callback: function(value) { return '$' + value/1000 + 'k'; } } }, x: { display: true, grid: { display: false }, ticks: { color: '#64748b' } } }, interaction: { intersect: false, mode: 'index' } }
         });
     </script>
 
@@ -418,7 +509,6 @@
         const tokenContract = getContract({
             client,
             chain: 11155111,
-            // UPDATED: This is now your official AURO token contract address
             address: "0xEa2B155A369bD44221dc2A9f28ABB2D6e13fB94F" 
         });
 
